@@ -1,13 +1,387 @@
+<!DOCTYPE html>
 <html>
 
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>ITASAT-1 Decoding</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="http://rjanuzi.github.io/itasat/imgs/itasat-logo.jpg" />
+
+    <!-- libs -->
+    <link href="css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   </head>
 
   <body>
-    <div>
-      <h1>Decodificador de Frames do ITASAT-1</h1>
-      <img src="imgs/itasat-logo.jpg" alt="Smiley face" height="42" width="42">
+  <main role="main" class="container main-container">
+
+    <div class="row">
+      <div class="col">
+        <h2>Decodificador de Frames do ITASAT-1</h2>
+      </div>
     </div>
+
+    <div class="row">
+      <div class="col">
+        <textarea id="frameFld" rows="4" cols="100"></textarea> <br>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-2">
+        <button type="button" class="btn btn-info" onclick="decode()">Decodificar!</button>
+      </div>
+      <div class="col-2">
+        <button type="button" class="btn btn-info" onclick="fillWithExample()">Exemplo</button>
+      </div>
+      <div class="col-8">
+        <label id="errorMsg" style="color: red"><label>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col">
+        <table class="table table-sm table-bordered table-hover table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Campo</th>
+              <th scope="col">Codificado</th>
+              <th scope="col">Decodificado</th>
+              <th scope="col">Descrição</th>
+            </tr>
+          </thead>
+          <tbody id="decodedTbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="footer fixed-bottom">
+      <span class="text-muted p-2">Dúvidas e Sugestões: <a href="mailto:rjanuzi@gmail.com" target="_top">rjanuzi@gmail.com </a> ou <a href="https://www.facebook.com/itasat1/">facebook.com/itasat1</a></span>
+    </footer>
+
+  </main>
   </body>
+
+  <script type="text/javascript">
+
+    function fillWithExample() {
+      document.getElementById("frameFld").value = "97 3a 01 01 49 54 41 53 41 54 2d 31 5c 02 00 00 5f 02 00 00 07 e2 07 12 07 21 02 00 00 01 ba 07 e2 07 12 04 23 32 00 00 29 88 01 00 00 00 00 00 00 00 00 3a ac 00 ad 00 02 00 02 00 00 00 00 00 00 00 07 00 12 00 14 00 11 00 11 00 0d 00 0d 03 02 00 00 01 97 07 e1 02 02 00 f2 00 40 02 da 00 de 00 78 29 00 00 f8 aa 55 7c 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+    }
+
+    function hexToInteger(hexVal) {
+      return parseInt(hexVal, 16);
+    }
+
+    function showError(errorMsg) {
+      document.getElementById("errorMsg").innerHTML = errorMsg;
+      document.getElementById("decodedTbody").innerHTML = "";
+    }
+
+    function genRow(frameFragData) {
+      return "<tr><td>" + frameFragData.name +
+             "</td><td>" + frameFragData.codedVal +
+             "</td><td>" + frameFragData.decodedVal +
+             "</td><td>" + frameFragData.desc +
+             "</td></tr>";
+    }
+
+    function fillResultWithBeacon(decodedFrame) {
+      let rows = "";
+
+      rows += genRow(decodedFrame.sync);
+      rows += genRow(decodedFrame.type);
+      rows += genRow(decodedFrame.count)
+      rows += genRow(decodedFrame.msg);
+      rows += genRow(decodedFrame.uhfTemp);
+      rows += genRow(decodedFrame.uhfStatus);
+      rows += genRow(decodedFrame.vhfTemp);
+      rows += genRow(decodedFrame.vhfStatus);
+      rows += genRow(decodedFrame.onboardTime);
+      rows += genRow(decodedFrame.lastResetTime);
+      rows += genRow(decodedFrame.uptime);
+      rows += genRow(decodedFrame.opMode);
+      rows += genRow(decodedFrame.lastTc);
+      rows += genRow(decodedFrame.lastTcTime);
+      rows += genRow(decodedFrame.batVolt);
+      rows += genRow(decodedFrame.batOutCurrent);
+      rows += genRow(decodedFrame.powerLinesCurrent);
+      rows += genRow(decodedFrame.batTemps);
+      rows += genRow(decodedFrame.batOpMode);
+      rows += genRow(decodedFrame.pptMode);
+      rows += genRow(decodedFrame.epsResetsCount);
+      rows += genRow(decodedFrame.lastEpsResetCause);
+
+      document.getElementById("decodedTbody").innerHTML = rows;
+    }
+
+    function genGroupData(name, codedVal, decodedVal, desc) {
+      return {name:name, codedVal:codedVal, decodedVal:decodedVal, desc:desc}
+    }
+
+    function breakAndFindBeacon(frameString) {
+      let frameTemp = [];
+      let findedSync1 = false, findedSync2 = false;
+
+      let frame = frameString.toUpperCase();
+      frame = frame.split(" ")
+
+      for(let i = 0; i < frame.length; i++) {
+        if(findedSync1 && findedSync2) {
+          frameTemp.push(frame[i])
+          continue;
+        }
+
+        if(!findedSync1) {
+          if(frame[i] == "97") {
+            findedSync1 = true;
+            frameTemp.push(frame[i]);
+            continue;
+          }
+        }
+
+        if(!findedSync2) {
+          if(frame[i] == "3A") {
+            findedSync2 = true;
+            frameTemp.push(frame[i]);
+            continue;
+          }
+        }
+      }
+      return frameTemp
+    }
+
+    function checkBeacon(beaconFrame) {
+      if(beaconFrame.length != 121) {
+        showError("Tamanho do frame de beacon inválido! (Esperado 121 bytes)")
+        return false;
+      }
+
+      if(beaconFrame[2] != "01") {
+        showError("Tipo do frame inválido! (Esperado 01)")
+        return false;
+      }
+
+      if(beaconFrame[3] != "01") {
+        showError("Contagem de frames inválida! (Esperado 01)")
+        return false;
+      }
+
+      showError("")
+      return true;
+    }
+
+    function decodeBeacon(frame) {
+      let codedTemp = "", decodedTemp = "";
+      let ant2Opened, ant4Opened;
+      let year, month, day, hour, minute, sec;
+      let tempVal;
+      let decodedBeacon = {};
+      let opModes = ["stub", "Safe", "Normal", "AR", "DCS", "GPS", "Camera"]
+      let batOpModes = ["stub", "INITIAL", "UNDER_VOLTAGE", "NOMINAL", "BATTERY_FULL"]
+      let pptModes = ["stub", "MPPT", "FIXED"]
+      let epsResetCauses = ["UNKNOW", "DEDICATED_WDT", "I2C_WDT", "HARD_RESET", "SOFT_RESET", "STACK_OVERFLOW", "TIMER_OVERFLOW", "BROWNOUT_OR_PWR_ON", "INTERNAL_WDT"]
+
+      // Sync bytes
+      decodedBeacon.sync = genGroupData("Sync Bytes", frame[0]+" "+frame[1], frame[0]+" "+frame[1], "Dois bytes para facilitar a sincronização na decodificação frames.");
+
+      // Frame type
+      decodedBeacon.type = genGroupData("Tipo do Frame", frame[2], frame[2], "Identifica o tipo do frame. (Beacon = 01)");
+
+      // Frame count
+      decodedBeacon.count = genGroupData("Contagem do frame", frame[3], frame[3], "Utilizado em telemetrias compostas.");
+
+      // Message
+      for(i = 4; i <= 11; i++) {
+        codedTemp += " " + frame[i];
+        decodedTemp += String.fromCharCode(hexToInteger(frame[i]));
+      }
+      decodedBeacon.msg = genGroupData("Mensagem", codedTemp , decodedTemp,  "Mensagem estática para facilitar o reconhecimento de pacotes por humanos.");
+
+      // UHF Antennas temp
+      tempVal = (hexToInteger(frame[12])<<8) | hexToInteger(frame[13]);
+      tempVal *= 0.003225;
+      decodedBeacon.uhfTemp = genGroupData("Temp. Antenas UHF", frame[12]+" "+frame[13] , tempVal,  "Temperatura medida no módulo de antenas UHF (Telemetrias).");
+
+      // UHF Antennas Status
+      tempVal = (hexToInteger(frame[14])<<8) | hexToInteger(frame[15]);
+      if((tempVal & 0x0800) == 0)
+        ant2Opened = "Aberta";
+      else
+        ant2Opened = "Fechada";
+
+      if((tempVal & 0x0008) == 0)
+        ant4Opened = "Aberta";
+      else
+        ant4Opened = "Fechada";
+
+      decodedBeacon.uhfStatus = genGroupData("Status Antenas UHF",  frame[14]+" "+frame[15],"Antena 2: " + ant2Opened + "<br>Antena 4: " + ant4Opened,  "Temperatura medida no módulo de antenas UHF.");
+
+      // VHF Antennas temp
+      tempVal = (hexToInteger(frame[16])<<8) | hexToInteger(frame[17]);
+      tempVal *= 0.003225;
+      decodedBeacon.vhfTemp = genGroupData("Temp. Antenas VHF", frame[16]+" "+frame[17] , tempVal,  "Temperatura medida no módulo de antenas VHF.");
+
+      // VHF Antennas Status
+      tempVal = (hexToInteger(frame[18])<<8) | hexToInteger(frame[19]);
+      if((tempVal & 0x0800) == 0)
+        ant2Opened = "Aberta";
+      else
+        ant2Opened = "Fechada";
+
+      if((tempVal & 0x0008) == 0)
+        ant4Opened = "Aberta";
+      else
+        ant4Opened = "Fechada";
+
+      decodedBeacon.vhfStatus = genGroupData("Status Antenas VHF",  frame[18]+" "+frame[19],"Antena 2: " + ant2Opened + "<br>Antena 4: " + ant4Opened,  "Temperatura medida no módulo de antenas UHF (Telemetrias).");
+
+      // Onboard time
+      codedTemp = ""
+      for(let i = 20; i <= 26; i++)
+        codedTemp += " " + frame[i];
+
+      year = (hexToInteger(frame[20])<<8) | hexToInteger(frame[21]);
+      month = hexToInteger(frame[22]);
+      day = hexToInteger(frame[23]);
+      hour = hexToInteger(frame[24]);
+      minute = hexToInteger(frame[25]);
+      sec = hexToInteger(frame[26]);
+
+      decodedTemp = day + "/" + month + "/" + year + " " + hour + ":" + minute + ":" + sec;
+      decodedBeacon.onboardTime = genGroupData("Horário a bordo", codedTemp, decodedTemp, "Horário a bordo.");
+
+      // Resets count
+      codedTemp = ""
+      for(let i = 27; i <= 30; i++)
+        codedTemp += " " + frame[i];
+      tempVal = (hexToInteger(frame[27])<<24) | (hexToInteger(frame[28])<<16) | (hexToInteger(frame[29])<<8) | hexToInteger(frame[30]);
+      decodedBeacon.resetsCount = genGroupData("Contador de resets", codedTemp, tempVal, "Contagem de resets do satélite.");
+
+      // Last reset time
+      codedTemp = ""
+      for(let i = 31; i <= 37; i++)
+        codedTemp += " " + frame[i];
+
+      year = (hexToInteger(frame[31])<<8) | hexToInteger(frame[32]);
+      month = hexToInteger(frame[33]);
+      day = hexToInteger(frame[34]);
+      hour = hexToInteger(frame[35]);
+      minute = hexToInteger(frame[36]);
+      sec = hexToInteger(frame[37]);
+
+      decodedTemp = day + "/" + month + "/" + year + " " + hour + ":" + minute + ":" + sec;
+      decodedBeacon.lastResetTime = genGroupData("Horário do último reset", codedTemp, decodedTemp, "Horário do último reset. (Referente ao horário de bordo)");
+
+      // Uptime count
+      codedTemp = ""
+      for(let i = 38; i <= 41; i++)
+        codedTemp += " " + frame[i];
+      tempVal = (hexToInteger(frame[38])<<24) | (hexToInteger(frame[39])<<16) | (hexToInteger(frame[40])<<8) | hexToInteger(frame[41]);
+      decodedBeacon.uptime = genGroupData("Tempo ligado", codedTemp, tempVal/60, "Contagem de tempo que satélite está ligado (em minutos).");
+
+      // Operational mode
+      tempVal = hexToInteger(frame[42])
+      decodedVal = opModes[tempVal]
+      decodedBeacon.opMode = genGroupData("Modo de operação", frame[42], decodedVal, "Modo de operação do satélite.");
+
+      // Last TC code
+      decodedBeacon.lastTc = genGroupData("Último telecomando", frame[43], frame[43], "Código do último telecomando executado.");
+
+      // Last TC time
+      codedTemp = ""
+      for(let i = 44; i <= 50; i++)
+        codedTemp += " " + frame[i];
+
+      year = (hexToInteger(frame[44])<<8) | hexToInteger(frame[45]);
+      month = hexToInteger(frame[46]);
+      day = hexToInteger(frame[47]);
+      hour = hexToInteger(frame[48]);
+      minute = hexToInteger(frame[49]);
+      sec = hexToInteger(frame[50]);
+
+      decodedTemp = day + "/" + month + "/" + year + " " + hour + ":" + minute + ":" + sec;
+      decodedBeacon.lastTcTime = genGroupData("Horário do último telecomando", codedTemp, decodedTemp, "Horário da execução do último telecomando. (Referente ao horário de bordo)");
+
+      // Bat voltage
+      tempVal = (hexToInteger(frame[51])<<8) | hexToInteger(frame[52]);
+      decodedBeacon.batVolt = genGroupData("Tensão da bateria", frame[51]+" "+frame[52] , tempVal + " mV",  "Nível de tensão (carga) da bateria do satélite.");
+
+      // Bat output current
+      tempVal = (hexToInteger(frame[53])<<8) | hexToInteger(frame[54]);
+      decodedBeacon.batOutCurrent = genGroupData("Saída de corrente da bateria", frame[53]+" "+frame[54] , tempVal + " mA",  "Corrente de saída da bateria. (Alimentação dos satélite)");
+
+      // Power lines current
+      codedVal = ""
+      for(let i = 55; i <= 66; i++)
+        codedVal += " " + frame[i];
+
+      // 5V1, GPS, DCS (5V), DCS Ant, Camera, DCS (3.3V)
+      decodedVal = "5V1: " + ((hexToInteger(frame[55])<<8) | hexToInteger(frame[56])) + " mA";
+      decodedVal += "<br>GPS: " + ((hexToInteger(frame[57])<<8) | hexToInteger(frame[58])) + " mA";
+      decodedVal += "<br>DCS (5V): " + ((hexToInteger(frame[59])<<8) | hexToInteger(frame[60])) + " mA";
+      decodedVal += "<br>DCS Ant: " + ((hexToInteger(frame[61])<<8) | hexToInteger(frame[62])) + " mA";
+      decodedVal += "<br>Camera: " + ((hexToInteger(frame[63])<<8) | hexToInteger(frame[64])) + " mA";
+      decodedVal += "<br>DCS (3.3V): " + ((hexToInteger(frame[65])<<8) | hexToInteger(frame[66])) + " mA";
+
+      decodedBeacon.powerLinesCurrent = genGroupData("Saída de corrente das linhas.", codedVal, decodedVal,  "Corrente de saída das linhas chaveadas de alimentação.");
+
+      // Bat temps
+      codedVal = ""
+      for(let i = 67; i <= 78; i++)
+        codedVal += " " + frame[i];
+
+      // TEMP1, TEMP2, TEMP3, TEMP4, BP4a, BP4b
+      decodedVal = "TEMP1: " + ((hexToInteger(frame[67])<<8) | hexToInteger(frame[68])) + " &deg;C";
+      decodedVal += "<br>TEMP2: " + ((hexToInteger(frame[69])<<8) | hexToInteger(frame[70])) + " &deg;C";
+      decodedVal += "<br>TEMP3: " + ((hexToInteger(frame[71])<<8) | hexToInteger(frame[72])) + " &deg;C";
+      decodedVal += "<br>TEMP4: " + ((hexToInteger(frame[73])<<8) | hexToInteger(frame[74])) + " &deg;C";
+      decodedVal += "<br>BP4a: " + ((hexToInteger(frame[75])<<8) | hexToInteger(frame[76])) + " &deg;C";
+      decodedVal += "<br>BP4b: " + ((hexToInteger(frame[77])<<8) | hexToInteger(frame[78])) + " &deg;C";
+
+      decodedBeacon.batTemps = genGroupData("Saída de corrente das linhas.", codedVal, decodedVal,  "Corrente de saída das linhas chaveadas de alimentação.");
+
+      // Bat op mode
+      tempVal = hexToInteger(frame[79])
+      decodedVal = batOpModes[tempVal]
+      decodedBeacon.batOpMode = genGroupData("Modo de operação da bateria.", frame[79], decodedVal, "Modo de operação do controlador da bateria.");
+
+      // EPS PPT Mode
+      tempVal = hexToInteger(frame[80])
+      decodedVal = pptModes[tempVal]
+      decodedBeacon.pptMode = genGroupData("Modo de PPT.", frame[80], decodedVal, "Modo PPT do controlador da bateria.");
+
+      // EPS reset count
+      codedTemp = ""
+      for(let i = 81; i <= 84; i++)
+        codedTemp += " " + frame[i];
+      tempVal = (hexToInteger(frame[81])<<24) | (hexToInteger(frame[82])<<16) | (hexToInteger(frame[83])<<8) | hexToInteger(frame[84]);
+      decodedBeacon.epsResetsCount = genGroupData("Contador de resets do EPS", codedTemp, tempVal, "Contagem de resets do EPS.");
+
+      // EPS last reset cause
+      tempVal = hexToInteger(frame[85])
+      decodedVal = epsResetCauses[tempVal]
+      decodedBeacon.lastEpsResetCause = genGroupData("Causa do último reset.", frame[85], decodedVal, "Causa do último reset do EPS.");
+
+      //TODO - Continuar nos frames 86-87 (Transceiver Power Line Voltage Level)
+
+      return decodedBeacon;
+    }
+
+    function decode() {
+      let fld = document.getElementById("frameFld");
+      let frame = breakAndFindBeacon(fld.value);
+
+      if(checkBeacon(frame)) {
+        fillResultWithBeacon(decodeBeacon(frame))
+      }
+    }
+
+  </script>
 
 </html>
