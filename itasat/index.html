@@ -220,7 +220,7 @@
       else
         ant4Opened = "Fechada";
 
-      decodedBeacon.uhfStatus = genGroupData("Status Antenas UHF",  frame[14]+" "+frame[15],"Antena 2: " + ant2Opened + "<br>Antena 4: " + ant4Opened,  "Temperatura medida no módulo de antenas UHF.");
+      decodedBeacon.uhfStatus = genGroupData("Status Antenas UHF",  frame[14]+" "+frame[15],"Antena 2: " + ant2Opened + "<br>Antena 4: " + ant4Opened,  "Status do módulo de antenas UHF.");
 
       // VHF Antennas temp
       tempVal = (hexToInteger(frame[16])<<8) | hexToInteger(frame[17]);
@@ -239,7 +239,7 @@
       else
         ant4Opened = "Fechada";
 
-      decodedBeacon.vhfStatus = genGroupData("Status Antenas VHF",  frame[18]+" "+frame[19],"Antena 2: " + ant2Opened + "<br>Antena 4: " + ant4Opened,  "Temperatura medida no módulo de antenas UHF (Telemetrias).");
+      decodedBeacon.vhfStatus = genGroupData("Status Antenas VHF",  frame[18]+" "+frame[19],"Antena 2: " + ant2Opened + "<br>Antena 4: " + ant4Opened,  "Status do módulo de antenas VHF.");
 
       // Onboard time
       codedTemp = ""
