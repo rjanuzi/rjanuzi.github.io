@@ -157,8 +157,8 @@
     }
 
     function checkBeacon(beaconFrame) {
-      if(beaconFrame.length != 121) {
-        showError("Tamanho do frame de beacon inválido! (Esperado 121 bytes)")
+      if(beaconFrame.length < 121) {
+        showError("Tamanho do frame de beacon inválido! (Esperado pelo menos 121 bytes)")
         return false;
       }
 
@@ -204,7 +204,7 @@
       decodedBeacon.msg = genGroupData("Mensagem", codedTemp , decodedTemp,  "Mensagem estática para facilitar o reconhecimento de pacotes por humanos.");
 
       // UHF Antennas temp
-      tempVal = (hexToInteger(frame[12])<<8) | hexToInteger(frame[13]);
+      tempVal = (hexToInteger(frame[13])<<8) | hexToInteger(frame[12]);
       tempVal *= 0.003225;
       decodedBeacon.uhfTemp = genGroupData("Temp. Antenas UHF", frame[12]+" "+frame[13] , tempVal,  "Temperatura medida no módulo de antenas UHF (Telemetrias).");
 
@@ -223,7 +223,7 @@
       decodedBeacon.uhfStatus = genGroupData("Status Antenas UHF",  frame[14]+" "+frame[15],"Antena 2: " + ant2Opened + "<br>Antena 4: " + ant4Opened,  "Status do módulo de antenas UHF.");
 
       // VHF Antennas temp
-      tempVal = (hexToInteger(frame[16])<<8) | hexToInteger(frame[17]);
+      tempVal = (hexToInteger(frame[17])<<8) | hexToInteger(frame[16]);
       tempVal *= 0.003225;
       decodedBeacon.vhfTemp = genGroupData("Temp. Antenas VHF", frame[16]+" "+frame[17] , tempVal,  "Temperatura medida no módulo de antenas VHF.");
 
